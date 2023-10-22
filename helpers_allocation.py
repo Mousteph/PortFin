@@ -193,3 +193,27 @@ def calculate_each_year_allocation(df_tickers: pd.DataFrame, nb_year_look_back: 
         
     money += sell_all_stocks(df_tickers_close, dis_allocation) 
     return money_values, df_money
+
+
+def compare_porfolio_to_market(portfolio: pd.DataFrame, market: pd.DataFrame) -> pd.DataFrame:
+    """
+    Compares the cumulative returns of a portfolio to a market index.
+
+    Args:
+        portfolio (pd.DataFrame): A DataFrame containing the total
+            value of the portfolio for each date.
+        market (pd.DataFrame): A DataFrame containing the total
+            value of the market index for each date.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the cumulative returns of
+            the portfolio and the market index.
+    """
+
+    first_date = portfolio.index[0]
+    last_date = portfolio.index[-1]
+    
+    df = pd.concat([portfolio, market.loc[first_date:last_date]], axis=1)
+    cum_returns = get_cumulative_returns(df)
+
+    plot_stock(cum_returns, 'Cumulative Returns Portfolio vs Market')
