@@ -4,6 +4,7 @@ from helpers_tickers import get_ticket_between_dates
 
 from pypfopt import EfficientFrontier
 from pypfopt import risk_models
+from pypfopt.risk_models import CovarianceShrinkage
 from pypfopt import expected_returns
 from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
 from pypfopt import objective_functions
@@ -57,12 +58,13 @@ def optimize_portfolio(df: pd.DataFrame, gamma: float = 0) -> Dict[str, float]:
     """
 
     mu = expected_returns.mean_historical_return(df)
-    S = risk_models.sample_cov(df)
+    S = CovarianceShrinkage(df).ledoit_wolf()
     
     ef = EfficientFrontier(mu, S)
     ef.add_objective(objective_functions.L2_reg, gamma=gamma)
     
     ef.max_sharpe()
+    # ef.min_volatility()
     cleaned_weights = ef.clean_weights(0.01, 3)
 
     return {i: cleaned_weights[i] for i in cleaned_weights if cleaned_weights[i] > 0}
@@ -188,7 +190,7 @@ def calculate_each_year_allocation(df_tickers: pd.DataFrame, nb_year_look_back: 
         money += sell_all_stocks(df_year, dis_allocation)
         money_values.append(money)
         
-        allocation = optimize_portfolio(df_year, 0.1)
+        allocation = optimize_portfolio(df_year, 0.01)
         dis_allocation, money = discrete_allocation(df_year, allocation, money)        
         
     money += sell_all_stocks(df_tickers_close, dis_allocation) 
