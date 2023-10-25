@@ -1,7 +1,7 @@
 import argparse
 import pandas as pd
 
-from helpers_tickers import (
+from src.helpers_tickers import (
     get_all_tickers_sp500,
     format_sp500_tickers,
     filter_out_tickers,
@@ -9,12 +9,11 @@ from helpers_tickers import (
     delete_all_null_tickers,
 )
 
-from helpers_allocation import (
+from src.helpers_allocation import (
     calculate_each_year_allocation,
-    # compare_porfolio_to_market,
 )
 
-from generate_report import generate_report
+from src.generate_report import generate_report
 
 def parse_argument() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='PortFin - Portfolio Allocation')
@@ -42,6 +41,5 @@ if __name__ == '__main__':
     sp500_market = download_tickers_data(['^GSPC'], 20)
     money_value, df_money = calculate_each_year_allocation(df_tickers, args.window)
     
-    # compare_porfolio_to_market(df_money, sp500_market["Close"])
     generate_report(df_money, sp500_market)
     

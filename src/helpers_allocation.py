@@ -1,6 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from helpers_tickers import get_ticket_between_dates
+from src.helpers_tickers import get_ticket_between_dates
 
 from pypfopt import EfficientFrontier
 from pypfopt import risk_models

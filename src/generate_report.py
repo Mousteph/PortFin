@@ -1,5 +1,5 @@
-from pdf_report import PdfReport
-from graphics import graph_portfolio_market
+from src.pdf_report import PdfReport
+from src.graphics import graph_portfolio_market
 import pandas as pd
 
 

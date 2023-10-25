@@ -1,7 +1,7 @@
 from io import BytesIO
 import matplotlib.pyplot as plt
 import pandas as pd
-from helpers_allocation import get_cumulative_returns
+from src.helpers_allocation import get_cumulative_returns
 
 
 def graph_portfolio_market(portfolio: pd.DataFrame, market: pd.DataFrame, title: str) -> BytesIO:
