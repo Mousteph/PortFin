@@ -1,5 +1,4 @@
 import pandas as pd
-import matplotlib.pyplot as plt
 from src.tickers import TickerManager
 from src.optimizer import optimize_portfolio, discrete_allocation
 
@@ -20,44 +19,6 @@ def get_cumulative_returns(df: pd.DataFrame) -> pd.DataFrame:
     return (1 + df.pct_change()).cumprod() - 1
 
 
-def plot_stock(df: pd.DataFrame, title: str):
-    """
-    Plots the stock prices from a given DataFrame.
-
-    Args:
-        df (pd.DataFrame): The DataFrame containing the stock prices.
-        title (str): The title of the plot.
-
-    Returns:
-        None
-    """
-    plt.figure(figsize=(14, 7))
-    plt.plot(df, linewidth=2)
-    plt.title(title)
-    plt.xlabel('Date')
-    plt.ylabel('Price')
-    plt.show()
-
-
-def get_cumulative_returns_portfolio(df_tickers: pd.DataFrame, allocation: Dict) -> pd.DataFrame:
-    """
-    Calculates the cumulative returns of a portfolio based on a given set of allocations.
-
-    Args:
-        df_tickers (pd.DataFrame): The DataFrame containing the asset prices.
-        allocation (Dict): A dictionary containing the allocation of assets.
-
-    Returns:
-        pd.DataFrame: A DataFrame containing the cumulative returns of the portfolio.
-    """
-
-    df_assets = df_tickers[allocation.keys()]
-    df_weights = allocation.values()
-    
-    portfolio = df_assets.pct_change().mul(df_weights, axis=1).sum(axis=1)
-    return (1 + portfolio).cumprod() - 1
-
-    
 def sell_all_stocks(df_tickers: pd.DataFrame, allocation: Dict) -> float:
     """
     Calculates the total value of all stocks in the allocation dictionary
