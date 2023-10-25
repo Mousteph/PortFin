@@ -11,8 +11,10 @@ from helpers_tickers import (
 
 from helpers_allocation import (
     calculate_each_year_allocation,
-    compare_porfolio_to_market,
+    # compare_porfolio_to_market,
 )
+
+from generate_report import generate_report
 
 def parse_argument() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='PortFin - Portfolio Allocation')
@@ -40,5 +42,6 @@ if __name__ == '__main__':
     sp500_market = download_tickers_data(['^GSPC'], 20)
     money_value, df_money = calculate_each_year_allocation(df_tickers, args.window)
     
-    compare_porfolio_to_market(df_money, sp500_market["Close"])
+    # compare_porfolio_to_market(df_money, sp500_market["Close"])
+    generate_report(df_money, sp500_market)
     

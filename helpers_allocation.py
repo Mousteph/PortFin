@@ -190,7 +190,7 @@ def calculate_each_year_allocation(df_tickers: pd.DataFrame, nb_year_look_back: 
         money += sell_all_stocks(df_year, dis_allocation)
         money_values.append(money)
         
-        allocation = optimize_portfolio(df_year, 0.01)
+        allocation = optimize_portfolio(df_year, 0.1)
         dis_allocation, money = discrete_allocation(df_year, allocation, money)        
         
     money += sell_all_stocks(df_tickers_close, dis_allocation) 
