@@ -1,6 +1,6 @@
 import argparse
 
-from src.tickers.ticker_downloader import TickerDownloader
+from src.tickers import TickerDownloader, TickerManager
 
 from src.helpers_allocation import (
     calculate_each_year_allocation,
@@ -20,7 +20,10 @@ if __name__ == '__main__':
     args = parse_argument()
     
     ticker_downloader = TickerDownloader()
+   
     df_tickers = ticker_downloader.download_tickers_sp500(args.years)
+    df_tickers = TickerManager(df_tickers)
+    
     sp500_market = ticker_downloader.download_tickers_data(['^GSPC'], 20, keep_null=True)
     
     money_value, df_money = calculate_each_year_allocation(df_tickers, args.window)

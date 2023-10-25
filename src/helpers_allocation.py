@@ -1,6 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from src.helpers_tickers import get_ticket_between_dates
+from src.tickers import TickerManager
 
 from pypfopt import EfficientFrontier
 from pypfopt import risk_models
@@ -150,7 +150,7 @@ def portfolio_values(df_tickers: pd.DataFrame, allocation: dict) -> pd.DataFrame
     return portfolio
 
 
-def calculate_each_year_allocation(df_tickers: pd.DataFrame, nb_year_look_back: int) -> Tuple[List[float], pd.DataFrame]:
+def calculate_each_year_allocation(df_tickers: TickerManager, nb_year_look_back: int) -> Tuple[List[float], pd.DataFrame]:
     """
     Calculates the allocation of a portfolio for each year based on the
     latest stock prices in the df_tickers DataFrame.
@@ -165,12 +165,12 @@ def calculate_each_year_allocation(df_tickers: pd.DataFrame, nb_year_look_back: 
         total value of the portfolio for each date in the df_tickers DataFrame.
     """
 
-    df_tickers_close = df_tickers["Close"]
-    
-    first_year = df_tickers_close.index[0].year
+    first_year = df_tickers.tickers.index[0].year
     first_year_calculation = first_year + nb_year_look_back
-    last_year = df_tickers_close.index[-1].year
-    
+    last_year = df_tickers.tickers.index[-1].year
+   
+    print(f"First year: {first_year}")
+     
     money = 10000
     dis_allocation = {}
     
@@ -179,21 +179,20 @@ def calculate_each_year_allocation(df_tickers: pd.DataFrame, nb_year_look_back: 
     
     for i in range(first_year_calculation, last_year + 1):
         if dis_allocation != {}:
-            df_porforlio_value = portfolio_values(get_ticket_between_dates(df_tickers_close, 
-                                                                           str(i), str(i + 1)), 
-                                                  dis_allocation)
+            close = df_tickers.get_ticket_between_dates(str(i), str(i + 1))["Close"]
+            df_porforlio_value = portfolio_values(close, dis_allocation)
             df_porforlio_value += money
     
             df_money = pd.concat([df_money, df_porforlio_value], axis=0)
         
-        df_year = get_ticket_between_dates(df_tickers_close, str(i - nb_year_look_back), str(i + 1))
+        df_year = df_tickers.get_ticket_between_dates(str(i - nb_year_look_back), str(i + 1))["Close"]
         money += sell_all_stocks(df_year, dis_allocation)
         money_values.append(money)
         
         allocation = optimize_portfolio(df_year, 0.1)
         dis_allocation, money = discrete_allocation(df_year, allocation, money)        
         
-    money += sell_all_stocks(df_tickers_close, dis_allocation) 
+    money += sell_all_stocks(df_tickers.tickers["Close"], dis_allocation) 
     return money_values, df_money
 
 
