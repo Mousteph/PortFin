@@ -1,13 +1,6 @@
 import argparse
-import pandas as pd
 
-from src.helpers_tickers import (
-    get_all_tickers_sp500,
-    format_sp500_tickers,
-    filter_out_tickers,
-    download_tickers_data,
-    delete_all_null_tickers,
-)
+from src.tickers.ticker_downloader import TickerDownloader
 
 from src.helpers_allocation import (
     calculate_each_year_allocation,
@@ -23,22 +16,13 @@ def parse_argument() -> argparse.Namespace:
     
     return parser.parse_args()
 
-def load_all_tickers_sp500(nb_years: int) -> pd.DataFrame:
-    all_tickers_raw = get_all_tickers_sp500()
-    all_tickers = format_sp500_tickers(all_tickers_raw)
-    all_tickers_filtered = filter_out_tickers(all_tickers, nb_years)
-    list_tickers = all_tickers_filtered.index.tolist()
-    
-    all_tickers_data = download_tickers_data(list_tickers, nb_years)
-    all_tickers_data = delete_all_null_tickers(all_tickers_data)
-    
-    return all_tickers_data
-
 if __name__ == '__main__':
     args = parse_argument()
     
-    df_tickers = load_all_tickers_sp500(args.years)
-    sp500_market = download_tickers_data(['^GSPC'], 20)
+    ticker_downloader = TickerDownloader()
+    df_tickers = ticker_downloader.download_tickers_sp500(args.years)
+    sp500_market = ticker_downloader.download_tickers_data(['^GSPC'], 20, keep_null=True)
+    
     money_value, df_money = calculate_each_year_allocation(df_tickers, args.window)
     
     generate_report(df_money, sp500_market)

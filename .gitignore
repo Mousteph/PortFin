@@ -1,6 +1,7 @@
 draft.txt
 .DS_Store
 *.pdf
+data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
