@@ -5,19 +5,6 @@ from src.optimizer import optimize_portfolio, discrete_allocation
 from typing import Dict, Tuple, List
 
 
-def get_cumulative_returns(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Calculates the cumulative returns of a given DataFrame.
-
-    Args:
-        df (pd.DataFrame): The DataFrame containing the returns data.
-
-    Returns:
-        pd.DataFrame: A DataFrame containing the cumulative returns.
-    """
-
-    return (1 + df.pct_change()).cumprod() - 1
-
 
 def sell_all_stocks(df_tickers: pd.DataFrame, allocation: Dict) -> float:
     """
@@ -32,12 +19,14 @@ def sell_all_stocks(df_tickers: pd.DataFrame, allocation: Dict) -> float:
         float: The total value of all stocks in the allocation dictionary.
     """
 
-    total = 0
+    if allocation == {}:
+        return 0
     
-    for ticker, shares in allocation.items():
-        total += df_tickers[ticker].iloc[-1] * shares
+    df_assets = df_tickers[allocation.keys()].iloc[-1]
+    df_weights = list(allocation.values())
+    portfolio = df_assets.mul(df_weights).sum()
     
-    return total
+    return portfolio
 
 
 def portfolio_values(df_tickers: pd.DataFrame, allocation: Dict) -> pd.DataFrame:
@@ -89,18 +78,18 @@ def calculate_each_year_allocation(df_tickers: TickerManager, nb_year_look_back:
     
     for i in range(first_year_calculation, last_year + 1):
         if dis_allocation != {}:
-            close = df_tickers.get_ticket_between_dates(str(i), str(i + 1))["Close"]
+            close = df_tickers.get_ticket_between_dates(str(i), str(i + 1))
             df_porforlio_value = portfolio_values(close, dis_allocation)
             df_porforlio_value += money
     
             df_money = pd.concat([df_money, df_porforlio_value], axis=0)
         
-        df_year = df_tickers.get_ticket_between_dates(str(i - nb_year_look_back), str(i + 1))["Close"]
+        df_year = df_tickers.get_ticket_between_dates(str(i - nb_year_look_back), str(i + 1))
         money += sell_all_stocks(df_year, dis_allocation)
         money_values.append(money)
         
         allocation = optimize_portfolio(df_year, 'max_sharpe', gamma=0.1)
         dis_allocation, money = discrete_allocation(df_year, allocation, money)        
         
-    money += sell_all_stocks(df_tickers.tickers["Close"], dis_allocation) 
+    money += sell_all_stocks(df_tickers.tickers, dis_allocation) 
     return money_values, df_money
