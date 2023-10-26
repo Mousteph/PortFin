@@ -1,7 +1,7 @@
 from pypfopt import EfficientFrontier
 from pypfopt.risk_models import CovarianceShrinkage
 from pypfopt import expected_returns
-from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
+from pypfopt.discrete_allocation import DiscreteAllocation
 from pypfopt import objective_functions
 
 import pandas as pd
@@ -50,7 +50,7 @@ def discrete_allocation(df: pd.DataFrame, weights: dict,
         Tuple[Dict[str, int], float]: A tuple containing the allocation of assets and the leftover cash.
     """
 
-    latest_prices = get_latest_prices(df)
+    latest_prices = df.ffill().iloc[0]
 
     da = DiscreteAllocation(weights, latest_prices, total_portfolio_value=total_portfolio_value)
     allocation, leftover = da.greedy_portfolio()
