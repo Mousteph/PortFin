@@ -1,6 +1,6 @@
 import argparse
 
-from src.tickers import TickerDownloader, TickerManager
+from src.tickers import TickerDownloader
 from src.functions import generate_allocation, generate_portfolio
 from src.pdf.generate_report import generate_report
 
@@ -18,7 +18,6 @@ if __name__ == '__main__':
     ticker_downloader = TickerDownloader()
 
     df_tickers = ticker_downloader.download_tickers_sp500(20)["Close"]
-    df_tickers = TickerManager(df_tickers)
 
     sp500_market = ticker_downloader.download_tickers_data(['^GSPC'], 20, keep_null=True)["Close"]
 
