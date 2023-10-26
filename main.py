@@ -6,7 +6,7 @@ from src.helpers_allocation import (
     calculate_each_year_allocation,
 )
 
-from src.generate_report import generate_report
+from src.pdf.generate_report import generate_report
 
 def parse_argument() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='PortFin - Portfolio Allocation')

@@ -24,8 +24,6 @@ def calculate_each_year_allocation(df_tickers: TickerManager, nb_year_look_back:
     first_year_calculation = first_year + nb_year_look_back
     last_year = df_tickers.tickers.index[-1].year
    
-    print(f"First year: {first_year}")
-     
     money = 10000
     dis_allocation = {}
     
