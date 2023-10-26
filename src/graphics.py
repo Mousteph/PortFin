@@ -28,7 +28,7 @@ def graphic_plot(portfolio: pd.DataFrame, market: pd.DataFrame, title: str) -> p
     ax.set_title(f"{title} from {first_date} to {last_date}", fontdict={'fontsize':8})
     
     ax.set_xlabel('Date', fontdict={'fontsize':8})
-    ax.set_ylabel('Returns', fontdict={'fontsize':8})
+    ax.set_ylabel(title, fontdict={'fontsize':8})
     
     ax.legend()
     plt.close()

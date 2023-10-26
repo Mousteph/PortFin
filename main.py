@@ -1,11 +1,7 @@
 import argparse
 
 from src.tickers import TickerDownloader, TickerManager
-
-from src.helpers_allocation import (
-    calculate_each_year_allocation,
-)
-
+from src.functions import generate_allocation, generate_portfolio
 from src.pdf.generate_report import generate_report
 
 def parse_argument() -> argparse.Namespace:
@@ -20,13 +16,15 @@ if __name__ == '__main__':
     args = parse_argument()
     
     ticker_downloader = TickerDownloader()
-   
-    df_tickers = ticker_downloader.download_tickers_sp500(args.years)["Close"]
+
+    df_tickers = ticker_downloader.download_tickers_sp500(20)["Close"]
     df_tickers = TickerManager(df_tickers)
-    
+
     sp500_market = ticker_downloader.download_tickers_data(['^GSPC'], 20, keep_null=True)["Close"]
-    
-    money_value, df_money = calculate_each_year_allocation(df_tickers, args.window)
-    
-    generate_report(df_money, sp500_market)
+
+    allocations = generate_allocation(df_tickers, 5)
+    portfolio = generate_portfolio(df_tickers, allocations, 1000)
+    market = sp500_market.loc[portfolio.index[0]:]
+
+    generate_report(portfolio, market, allocations)
     

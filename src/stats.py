@@ -41,4 +41,4 @@ def get_max_drawdown(df: pd.DataFrame, period: str = 'D') -> float:
     """
 
     returns = get_returns(df, period)
-    return (returns/returns.cummax() - 1).min()
+    return returns / returns.cummax() - 1
