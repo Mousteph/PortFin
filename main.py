@@ -25,5 +25,5 @@ if __name__ == '__main__':
     portfolio = generate_portfolio(df_tickers, allocations, 1000)
     market = sp500_market.loc[portfolio.index[0]:]
 
-    generate_report(portfolio, market, allocations)
+    generate_report(portfolio, market, allocations, ticker_downloader)
     

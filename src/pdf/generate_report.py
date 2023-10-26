@@ -1,17 +1,20 @@
 from src.pdf.pdf_report import PdfReport
+from src.tickers import TickerDownloader
 from src.graphics import graphic_plot, allocation_plot
 from src.stats import get_returns, get_max_drawdown
+
 import pandas as pd
 from typing import Dict
 
 
-def generate_report(portfolio: pd.DataFrame, market: pd.DataFrame, allocations: Dict) -> None:
+def generate_report(portfolio: pd.DataFrame, market: pd.DataFrame, allocations: Dict, downloader: TickerDownloader) -> None:
     """Generates a PDF report containing portfolio performance metrics and visualizations.
 
     Args:
         portfolio (pd.DataFrame): A pandas DataFrame containing the portfolio returns.
         market (pd.DataFrame): A pandas DataFrame containing the market returns.
         allocations (Dict): A dictionary containing the asset allocation weights for each year.
+        downloader (TickerDownloader): A TickerDownloader object used to download and process financial data.
     """
 
     returns_portfolio = get_returns(portfolio)
@@ -35,10 +38,16 @@ def generate_report(portfolio: pd.DataFrame, market: pd.DataFrame, allocations: 
         drawdown_portfolio_year = get_max_drawdown(portfolio_year)
         drawdown_market_year = get_max_drawdown(market_year)
         
-        allocation_plot_year = allocation_plot(year, allocations)
+        title_allocation = f"Portfolio allocation % in {year}"
+        allocation_plot_year = allocation_plot(title_allocation, allocations.get(year))
+
+        title_allocatio_sector = f"Portfolio allocation % in {year} by sector"
+        allocation_sector = downloader.generate_allocation_sectors(allocations.get(year))
+        all_sector_plot_year = allocation_plot(title_allocatio_sector, allocation_sector)
+        
         returns_plot_year = graphic_plot(returns_portfolio_year, returns_market_year, "Returns")
         drawdown_plot_year = graphic_plot(drawdown_portfolio_year, drawdown_market_year, "Drawdown")
         
-        document.year_page(f"Year {year}", returns_plot_year, drawdown_plot_year, allocation_plot_year)
+        document.year_page(f"Year {year}", returns_plot_year, drawdown_plot_year, allocation_plot_year, all_sector_plot_year)
         
     document.create_document()

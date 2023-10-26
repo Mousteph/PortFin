@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Dict
 import pandas as pd
 import yfinance as yf
 
@@ -25,7 +25,10 @@ class TickerDownloader:
             Downloads ticker data for a list of tickers and a specified date range.
         download_tickers_sp500(x_years: int, keep_null: bool = False, force_reload: bool = False) -> pd.DataFrame:
             Downloads ticker data for all S&P 500 tickers and a specified date range.
-
+        get_sectors(self, tickers: List[str]) -> List[str]:
+            Returns a list of sectors for a list of tickers.
+        generate_allocation_sectors(self, allocations: Dict) -> Dict:
+            Generates a dictionary of sector allocations for each year.
     """
 
     SP500_COMPANIES = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
@@ -175,3 +178,34 @@ class TickerDownloader:
         df.to_csv(TickerDownloader.file_name(start, end))
         
         return df
+
+    def get_sectors(self, tickers: List[str]) -> List[str]:
+        """Returns a list of sectors for a list of tickers.
+
+        Args:
+            tickers (List[str]): A list of tickers to get the sectors for.
+
+        Returns:
+            List[str]: A list of sectors for the tickers.
+        """
+
+        return self.get_all_sp500_tickers_filtered()[self.get_all_sp500_tickers_filtered().index.isin(tickers)]["Sector"].tolist()
+    
+    def generate_allocation_sectors(self, allocation: Dict) -> Dict:
+        """Generates a dictionary of sector allocations for each year.
+
+        Args:
+            allocation (Dict): A dictionary containing the asset allocation weights.
+
+        Returns:
+            Dict: A dictionary of sector allocations for each year.
+        """
+        
+        sectors = self.get_sectors(list(allocation.keys()))
+        coeef = allocation.values()
+        dict_sector = {}
+
+        for sector, weight in zip(sectors, coeef):
+            dict_sector[sector] = dict_sector.get(sector, 0) + weight
+
+        return dict_sector

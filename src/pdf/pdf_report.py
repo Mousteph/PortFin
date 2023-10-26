@@ -107,27 +107,30 @@ class PdfReport:
         
         self.add_page_break()
 
-    def year_page(self, title: str, returns: plt.Figure, drawdown: plt.Figure, allocation: plt.Figure) -> None:
-        """Adds a title and three images to a yearly page of the report.
+    def year_page(self, title: str, returns: plt.Figure, drawdown: plt.Figure, allocation: plt.Figure, allocation_sector: plt.Figure) -> None:
+        """Adds a title and four images to a yearly page of the report.
 
         Args:
             title (str): The title to be added to the yearly page of the report.
             returns (plt.Figure): The matplotlib Figure object containing the returns data to add to the yearly page of the report.
             drawdown (plt.Figure): The matplotlib Figure object containing the drawdown data to add to the yearly page of the report.
             allocation (plt.Figure): The matplotlib Figure object containing the allocation data to add to the yearly page of the report.
+            allocation_sector (plt.Figure): The matplotlib Figure object containing the allocation sector data to add to the yearly page of the report.
         """
         
         returns = self.__create_image_pdf(returns, 270, 180)
         drawdown = self.__create_image_pdf(drawdown, 270, 180)
-        allocation = self.__create_image_pdf(allocation, 250, 250, align="LEFT")
+        allocation = self.__create_image_pdf(allocation, 270, 270)
+        allocation_sector = self.__create_image_pdf(allocation_sector, 270, 270)
         
         title = self.add_title(title)
-        tables = Table([[returns, drawdown]])
+        alloc = Table([[allocation, allocation_sector]])
+        retur = Table([[returns, drawdown]])
         
         self.report.append(title)
         self.report.append(Spacer(1, 12))
-        self.report.append(allocation)
+        self.report.append(alloc)
         self.report.append(Spacer(1, 12))
-        self.report.append(tables)
+        self.report.append(retur)
 
         self.add_page_break()

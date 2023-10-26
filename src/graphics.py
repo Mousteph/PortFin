@@ -36,24 +36,24 @@ def graphic_plot(portfolio: pd.DataFrame, market: pd.DataFrame, title: str) -> p
     return fig
 
 
-def allocation_plot(year: int, allocations: Dict) -> plt.Figure:
+def allocation_plot(title: str, allocation: Dict) -> plt.Figure:
     """Plots a pie chart of the asset allocation for a given year.
 
     Args:
-        year (int): The year to plot the asset allocation for.
-        allocations (Dict): A dictionary containing the asset allocation weights for each year.
+        title (str): The title of the pie chart.
+        allocation (Dict): A dictionary containing the asset allocation weights.
 
     Returns:
         plt.Figure: A matplotlib Figure object containing the pie chart.
     """
-    allocation = allocations.get(year)
+    
     fig, ax = plt.subplots(figsize=(7, 7), dpi=300)
     
     sizes = list(allocation.values())
     labels = list(allocation.keys())
     
     ax.pie(sizes, labels=labels, autopct='%.2f%%')
-    ax.set_title(f"Portfolio allocation in % in {year}", fontdict={'fontsize':8})
+    ax.set_title(title, fontdict={'fontsize':8})
     
     plt.close()
     
