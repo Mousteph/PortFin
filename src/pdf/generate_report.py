@@ -7,7 +7,9 @@ import pandas as pd
 from typing import Dict
 
 
-def generate_report(portfolio: pd.DataFrame, market: pd.DataFrame, allocations: Dict, downloader: TickerDownloader) -> None:
+def generate_report(portfolio: pd.DataFrame, market: pd.DataFrame, allocations: Dict,
+                    downloader: TickerDownloader, pdf_name: str = 'report.pdf',
+                    full_report: bool = True) -> None:
     """Generates a PDF report containing portfolio performance metrics and visualizations.
 
     Args:
@@ -15,6 +17,8 @@ def generate_report(portfolio: pd.DataFrame, market: pd.DataFrame, allocations: 
         market (pd.DataFrame): A pandas DataFrame containing the market returns.
         allocations (Dict): A dictionary containing the asset allocation weights for each year.
         downloader (TickerDownloader): A TickerDownloader object used to download and process financial data.
+        pdf_name (str, optional): The name of the PDF report. Defaults to 'report.pdf'.
+        full_report (bool, optional): Whether to generate a full report or not. Defaults to True.
     """
 
     returns_portfolio = get_returns(portfolio)
@@ -25,9 +29,13 @@ def generate_report(portfolio: pd.DataFrame, market: pd.DataFrame, allocations: 
     returns_plot = graphic_plot(returns_portfolio, returns_market, "Returns")
     drawdown_plot = graphic_plot(drawdown_portfolio, drawdown_market, "Drawdown")
 
-    document = PdfReport("report.pdf")
+    document = PdfReport(pdf_name)
     document.first_page("Portfolio Report", returns_plot)
     document.summary_page("Summary", returns_plot, drawdown_plot)
+
+    if not full_report:
+        document.create_document()
+        return
 
     for year in allocations.keys():
         portfolio_year = portfolio.loc[str(year)]
