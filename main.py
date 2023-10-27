@@ -2,8 +2,8 @@ import argparse
 
 from src.tickers import TickerDownloader
 from src.functions import generate_allocation, generate_portfolio
-from src.pdf.generate_report import generate_report
-from src.optimizer import OptimizerEfficient
+from src.pdf.generate_report import generate_report, StructPortfolio
+from src.optimizer import OptimizerEfficient, OptimizerBase
 
 def parse_argument() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='PortFin - Portfolio Allocation')
@@ -34,12 +34,18 @@ if __name__ == '__main__':
     ticker_downloader = TickerDownloader()
 
     df_tickers = ticker_downloader.download_tickers_sp500(args.years, force_reload=args.force)["Close"]
-    sp500_market = ticker_downloader.download_tickers_data(['^GSPC'], args.years)["Close"]
-    
-    optimizer = OptimizerEfficient(args.optimizer, args.gamma)
-    allocations = generate_allocation(df_tickers, args.window, optimizer)
-    portfolio = generate_portfolio(df_tickers, allocations, args.money)
-    market = sp500_market.loc[portfolio.index[0]:]
+    sp500_market = ticker_downloader.download_tickers_data(['^GSPC'], args.years)["Close"] / 10
+    market = sp500_market.to_frame()
 
-    generate_report(portfolio, market, allocations, ticker_downloader, args.name, args.full)
+    optimizer_tickers = OptimizerEfficient(args.optimizer, args.gamma)
+    allocations_tickers = generate_allocation(df_tickers, args.window, optimizer_tickers)
+    portfolio_tickers = generate_portfolio(df_tickers, allocations_tickers, args.money)
+    portfolio = StructPortfolio(portfolio_tickers, allocations_tickers)
+    
+    optimizer_market = OptimizerBase()
+    allocations_market = generate_allocation(market, args.window, optimizer_market)
+    portfolio_market = generate_portfolio(market, allocations_market, args.money)
+    market = StructPortfolio(portfolio_market, allocations_market)
+    
+    generate_report(portfolio, market, ticker_downloader, args.name, args.full)
     

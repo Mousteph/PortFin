@@ -1,3 +1,3 @@
-from src.pdf.generate_report import generate_report
+from src.pdf.generate_report import generate_report, StructPortfolio
 
-__all__ = ["generate_report"]
+__all__ = ["generate_report", "StructPortfolio"]
