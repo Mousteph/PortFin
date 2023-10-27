@@ -17,8 +17,16 @@ def parse_argument() -> argparse.Namespace:
     
     return parser.parse_args()
 
+def print_arguments_selected(args: argparse.Namespace):
+    print(f"Number of years needed to backtest the strategy: {args.years}")
+    print(f"Minimum number of years needed to backtest the stock: {args.window}")
+    print(f"Initial investment: {args.money}")
+    print(f"Optimizer selected: {args.optimizer} | Regularization parameter: {args.gamma}")
+    print(f"Name of the PDF report: {args.name} | Full report: {args.full}\n")
+
 if __name__ == '__main__':
     args = parse_argument()
+    print_arguments_selected(args)
     
     ticker_downloader = TickerDownloader()
 
