@@ -1,6 +1,7 @@
 import pandas as pd
 from src.optimizer import optimize_portfolio, discrete_allocation
 from typing import Dict
+from tqdm import tqdm
 
 
 def generate_allocation(df_tickers: pd.DataFrame, x_years_lb: int, optimizer: str = 'max_sharpe', gamma: float = 0.1) -> Dict[int, Dict[str, float]]:
@@ -21,8 +22,14 @@ def generate_allocation(df_tickers: pd.DataFrame, x_years_lb: int, optimizer: st
     last_year = df_tickers.index[-1].year
     
     allocation_years = {}
-    
-    for year in range(first_year_calculation, last_year + 1):
+    t_range = tqdm(range(first_year_calculation, last_year + 1),
+                   desc='Generating allocations',
+                   ncols=100)
+     
+    for year in t_range:
+        t_range.set_description(f"Generating allocations for {year}")
+        t_range.refresh()
+        
         df_x_year = df_tickers.loc[:str(year - 1)]
         allocation = optimize_portfolio(df_x_year, optimizer, gamma=gamma)
         allocation_years[year] = allocation

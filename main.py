@@ -23,7 +23,6 @@ if __name__ == '__main__':
     ticker_downloader = TickerDownloader()
 
     df_tickers = ticker_downloader.download_tickers_sp500(20)["Close"]
-
     sp500_market = ticker_downloader.download_tickers_data(['^GSPC'], 20, keep_null=True)["Close"]
 
     allocations = generate_allocation(df_tickers, 5, args.optimizer, args.gamma)

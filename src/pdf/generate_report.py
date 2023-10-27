@@ -5,6 +5,7 @@ from src.stats import get_returns, get_max_drawdown
 
 import pandas as pd
 from typing import Dict
+from tqdm import tqdm
 
 
 def generate_report(portfolio: pd.DataFrame, market: pd.DataFrame, allocations: Dict,
@@ -21,6 +22,7 @@ def generate_report(portfolio: pd.DataFrame, market: pd.DataFrame, allocations: 
         full_report (bool, optional): Whether to generate a full report or not. Defaults to True.
     """
 
+    print("Generating report...")
     returns_portfolio = get_returns(portfolio)
     returns_market = get_returns(market)
     drawdown_portfolio = get_max_drawdown(portfolio)
@@ -34,10 +36,18 @@ def generate_report(portfolio: pd.DataFrame, market: pd.DataFrame, allocations: 
     document.summary_page("Summary", returns_plot, drawdown_plot)
 
     if not full_report:
+        print("Concise report generated, creating PDF...")
         document.create_document()
         return
 
-    for year in allocations.keys():
+    t_range = tqdm(allocations.keys(),
+                   desc='Generating report page',
+                   ncols=100)
+    
+    for year in t_range:
+        t_range.set_description(f"Generating  report page for {year}")
+        t_range.refresh()
+        
         portfolio_year = portfolio.loc[str(year)]
         market_year = market.loc[str(year)]
         
@@ -58,4 +68,5 @@ def generate_report(portfolio: pd.DataFrame, market: pd.DataFrame, allocations: 
         
         document.year_page(f"Year {year}", returns_plot_year, drawdown_plot_year, allocation_plot_year, all_sector_plot_year)
         
+    print("Full report generated, creating PDF...")
     document.create_document()

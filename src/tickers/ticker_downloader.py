@@ -133,14 +133,20 @@ class TickerDownloader:
         Returns:
             pd.DataFrame: A pandas DataFrame containing the downloaded ticker data.
         """
-
+        
         if x_years is not None:
             current_year = pd.to_datetime("today").year
             end = f"{current_year}-01-01"
             years = current_year - x_years
             start = f"{years}-01-01"
 
-        tickers_data = yf.download(tickers, start=start, end=end)
+        print_tickers = str(tickers)
+        if len(tickers) > 5:
+            print_tickers = str(tickers[:2]) + "..." + str(tickers[-2:])
+            
+        print(f"Downloading {print_tickers} tickers from {start} to {end}...")
+        tickers_data = yf.download(tickers, start=start, end=end, progress=False)
+        print(f"Downloaded {print_tickers} tickers from {start} to {end}.")
         
         if not keep_null:
             tickers_data = self.__delete_all_null_tickers(tickers_data)
@@ -164,8 +170,11 @@ class TickerDownloader:
         years = current_year - x_years
         start = f"{years}-01-01"
         
-        if not force_reload and self.__reload_download_tickers(start, end) is not None:
-            return self.__reload_download_tickers(start, end)
+        reloaded = self.__reload_download_tickers(start, end)
+        if not force_reload and reloaded is not None:
+            print(f"Already downloaded S&P500 tickers from {start} to {end} "\
+                  f"founded in {TickerDownloader.file_name(start, end)}")
+            return reloaded
         
         sp500_tickers = self.get_all_sp500_tickers_filtered(x_years).index.tolist()
         df = self.download_tickers_data(sp500_tickers, start=start, end=end, keep_null=keep_null)
