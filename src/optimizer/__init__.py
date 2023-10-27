@@ -1,3 +1,3 @@
-from .optimize_portfolio import optimize_portfolio, discrete_allocation
+from .optimize_portfolio import discrete_allocation, PortfolioOptimizer, PortfolioBase
 
-__all__ = ["optimize_portfolio", "discrete_allocation"]
+__all__ = ["discrete_allocation", "PortfolioOptimizer", "PortfolioBase"]

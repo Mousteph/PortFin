@@ -19,7 +19,8 @@ def __delete_null_tickers(tickers: pd.DataFrame) -> pd.DataFrame:
     
     return tickers
 
-def generate_allocation(df_tickers: pd.DataFrame, x_years_lb: int, optimizer: str = 'max_sharpe', gamma: float = 0.1) -> Dict[int, Dict[str, float]]:
+# def generate_allocation(df_tickers: pd.DataFrame, x_years_lb: int, optimizer: str = 'max_sharpe', gamma: float = 0.1) -> Dict[int, Dict[str, float]]:
+def generate_allocation(df_tickers: pd.DataFrame, x_years_lb: int, optimizer) -> Dict[int, Dict[str, float]]:
     """Generates an allocation for each year between the first year and x_years_lb years after the first year.
 
     Args:
@@ -45,10 +46,10 @@ def generate_allocation(df_tickers: pd.DataFrame, x_years_lb: int, optimizer: st
         t_range.set_description(f"Generating allocations for {year}")
         t_range.refresh()
         
-        df_x_year = df_tickers.loc[str(year - 5):str(year - 1)]
+        df_x_year = df_tickers.loc[str(year - x_years_lb):str(year - 1)]
         df_x_year = __delete_null_tickers(df_x_year)
         
-        allocation = optimize_portfolio(df_x_year, optimizer, gamma=gamma)
+        allocation = optimizer(df_x_year)
         allocation_years[year] = allocation
         
     return allocation_years
@@ -93,7 +94,7 @@ def generate_portfolio(df_tickers: pd.DataFrame, allocation: Dict, money: int) -
         dis_allocation, left_over = discrete_allocation(df_x_year, allocation, money)
         dx_x_year_value = calculate_portfolio(df_x_year, dis_allocation) + left_over
         portfolio = pd.concat([portfolio, dx_x_year_value])
-        money = dx_x_year_value.iloc[-1]
+        money = dx_x_year_value.iloc[-1] # -> add reinvestemen money
     
     portfolio.index = pd.to_datetime(portfolio.index)
     portfolio.columns = ["Portfolio"]
