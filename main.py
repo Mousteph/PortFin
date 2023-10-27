@@ -3,7 +3,7 @@ import argparse
 from src.tickers import TickerDownloader
 from src.functions import generate_allocation, generate_portfolio
 from src.pdf.generate_report import generate_report
-from src.optimizer import PortfolioOptimizer
+from src.optimizer import OptimizerEfficient
 
 def parse_argument() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='PortFin - Portfolio Allocation')
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     df_tickers = ticker_downloader.download_tickers_sp500(args.years, force_reload=args.force)["Close"]
     sp500_market = ticker_downloader.download_tickers_data(['^GSPC'], args.years)["Close"]
     
-    optimizer = PortfolioOptimizer(args.optimizer, args.gamma)
+    optimizer = OptimizerEfficient(args.optimizer, args.gamma)
     allocations = generate_allocation(df_tickers, args.window, optimizer)
     portfolio = generate_portfolio(df_tickers, allocations, args.money)
     market = sp500_market.loc[portfolio.index[0]:]

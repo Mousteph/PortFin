@@ -1,5 +1,5 @@
 import pandas as pd
-from src.optimizer import optimize_portfolio, discrete_allocation
+from src.optimizer import discrete_allocation, OptimizerBase
 from typing import Dict
 from tqdm import tqdm
 
@@ -19,15 +19,13 @@ def __delete_null_tickers(tickers: pd.DataFrame) -> pd.DataFrame:
     
     return tickers
 
-# def generate_allocation(df_tickers: pd.DataFrame, x_years_lb: int, optimizer: str = 'max_sharpe', gamma: float = 0.1) -> Dict[int, Dict[str, float]]:
-def generate_allocation(df_tickers: pd.DataFrame, x_years_lb: int, optimizer) -> Dict[int, Dict[str, float]]:
+def generate_allocation(df_tickers: pd.DataFrame, x_years_lb: int, optimizer: OptimizerBase) -> Dict[int, Dict[str, float]]:
     """Generates an allocation for each year between the first year and x_years_lb years after the first year.
 
     Args:
-        df_tickers (TickerManager): A TickerManager object containing the asset returns.
+        df_tickers (pd.DataFrame): A DataFrame object containing the asset returns.
         x_years_lb (int): The number of years after the first year to generate allocations for.
-        optimizer (str, optional): The optimization objective. Must be either "max_sharpe" or "min_volatility". Defaults to 'max_sharpe'.
-        gamma (float, optional): The regularization parameter. Defaults to 0.1.
+        optimizer (OptimizerBase): An optimizer object to use for generating the allocations.
 
     Returns:
         Dict[int, Dict[str, float]]: A dictionary containing the allocation for each year.
