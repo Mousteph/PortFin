@@ -18,6 +18,7 @@ def optimize_portfolio(df: pd.DataFrame, optizer: str = 'max_sharpe', gamma: flo
     Returns:
         Dict[str, float]: A dictionary containing the optimized weights for each asset.
     """
+
     mu = expected_returns.mean_historical_return(df)
     S = CovarianceShrinkage(df).ledoit_wolf()
     
@@ -51,7 +52,6 @@ def discrete_allocation(df: pd.DataFrame, weights: dict,
     """
 
     latest_prices = df.ffill().iloc[0]
-
     da = DiscreteAllocation(weights, latest_prices, total_portfolio_value=total_portfolio_value)
     allocation, leftover = da.greedy_portfolio()
     
