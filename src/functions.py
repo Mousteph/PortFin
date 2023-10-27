@@ -3,12 +3,14 @@ from src.optimizer import optimize_portfolio, discrete_allocation
 from typing import Dict
 
 
-def generate_allocation(df_tickers: pd.DataFrame, x_years_lb: int) -> Dict[int, Dict[str, float]]:
+def generate_allocation(df_tickers: pd.DataFrame, x_years_lb: int, optimizer: str = 'max_sharpe', gamma: float = 0.1) -> Dict[int, Dict[str, float]]:
     """Generates an allocation for each year between the first year and x_years_lb years after the first year.
 
     Args:
         df_tickers (TickerManager): A TickerManager object containing the asset returns.
         x_years_lb (int): The number of years after the first year to generate allocations for.
+        optimizer (str, optional): The optimization objective. Must be either "max_sharpe" or "min_volatility". Defaults to 'max_sharpe'.
+        gamma (float, optional): The regularization parameter. Defaults to 0.1.
 
     Returns:
         Dict[int, Dict[str, float]]: A dictionary containing the allocation for each year.
@@ -22,7 +24,7 @@ def generate_allocation(df_tickers: pd.DataFrame, x_years_lb: int) -> Dict[int, 
     
     for year in range(first_year_calculation, last_year + 1):
         df_x_year = df_tickers.loc[:str(year - 1)]
-        allocation = optimize_portfolio(df_x_year, 'max_sharpe', gamma=0.1)
+        allocation = optimize_portfolio(df_x_year, optimizer, gamma=gamma)
         allocation_years[year] = allocation
         
     return allocation_years
