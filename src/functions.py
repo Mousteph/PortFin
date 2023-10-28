@@ -71,13 +71,15 @@ def calculate_portfolio(df: pd.DataFrame, allocation: Dict) -> pd.Series:
     return portfolio_value
     
 
-def generate_portfolio(df_tickers: pd.DataFrame, allocation: Dict, money: int) -> pd.DataFrame:
+def generate_portfolio(df_tickers: pd.DataFrame, allocation: Dict, money: int,
+                       reinvest: int = 0) -> pd.DataFrame:
     """Generates a portfolio given a TickerManager object, an allocation, and an initial investment.
 
     Args:
         df_tickers (TickerManager): A TickerManager object containing the asset returns.
         allocation (Dict): A dictionary containing the asset allocation weights.
         money (int): The initial investment.
+        reinvest (int, optional): The amount of money to reinvest each year. Defaults to 0.
 
     Returns:
         pd.DataFrame: A pandas DataFrame containing the portfolio value over time.
@@ -92,7 +94,7 @@ def generate_portfolio(df_tickers: pd.DataFrame, allocation: Dict, money: int) -
         dis_allocation, left_over = discrete_allocation(df_x_year, allocation, money)
         dx_x_year_value = calculate_portfolio(df_x_year, dis_allocation) + left_over
         portfolio = pd.concat([portfolio, dx_x_year_value])
-        money = dx_x_year_value.iloc[-1] # -> add reinvestemen money
+        money = dx_x_year_value.iloc[-1] + reinvest
     
     portfolio.index = pd.to_datetime(portfolio.index)
     portfolio.columns = ["Portfolio"]

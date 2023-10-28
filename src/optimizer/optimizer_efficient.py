@@ -57,6 +57,6 @@ class OptimizerEfficient(OptimizerBase):
         else:
             raise ValueError('Invalid optimizer. Must be either "max_sharpe" or "min_volatility".')
         
-        cleaned_weights = ef.clean_weights(0.01, 3)
+        cleaned_weights = ef.clean_weights()
 
         return {i: cleaned_weights[i] for i in cleaned_weights if cleaned_weights[i] > 0}
