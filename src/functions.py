@@ -1,6 +1,6 @@
 import pandas as pd
 from src.optimizer import discrete_allocation, OptimizerBase
-from typing import Dict
+from typing import Dict, Tuple
 from tqdm import tqdm
 
 def __delete_null_tickers(tickers: pd.DataFrame) -> pd.DataFrame:
@@ -72,7 +72,7 @@ def calculate_portfolio(df: pd.DataFrame, allocation: Dict) -> pd.Series:
     
 
 def generate_portfolio(df_tickers: pd.DataFrame, allocation: Dict, money: int,
-                       reinvest: int = 0) -> pd.DataFrame:
+                       reinvest: int = 0) -> Tuple[pd.DataFrame, float]:
     """Generates a portfolio given a TickerManager object, an allocation, and an initial investment.
 
     Args:
@@ -82,10 +82,11 @@ def generate_portfolio(df_tickers: pd.DataFrame, allocation: Dict, money: int,
         reinvest (int, optional): The amount of money to reinvest each year. Defaults to 0.
 
     Returns:
-        pd.DataFrame: A pandas DataFrame containing the portfolio value over time.
+        Tuple[pd.DataFrame, float]: A pandas DataFrame containing the portfolio value over time and amount of money reinvested.
     """
 
     portfolio = pd.DataFrame()
+    total_reinvested = 0
     
     for year, allocation in allocation.items():
         df_x_year = df_tickers.loc[str(year)]
@@ -95,9 +96,10 @@ def generate_portfolio(df_tickers: pd.DataFrame, allocation: Dict, money: int,
         dx_x_year_value = calculate_portfolio(df_x_year, dis_allocation) + left_over
         portfolio = pd.concat([portfolio, dx_x_year_value])
         money = dx_x_year_value.iloc[-1] + reinvest
+        total_reinvested += reinvest
     
     portfolio.index = pd.to_datetime(portfolio.index)
     portfolio.columns = ["Portfolio"]
     portfolio.index.name = "Date"
     
-    return portfolio
+    return portfolio, total_reinvested

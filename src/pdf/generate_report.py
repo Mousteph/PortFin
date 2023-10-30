@@ -1,16 +1,17 @@
-from src.pdf.pdf_report import PdfReport
+from src.pdf.pdf_report import PdfReport, StructSummaryData
 from src.tickers import TickerDownloader
 from src.graphics import graphic_plot, allocation_plot
-from src.stats import get_returns, get_max_drawdown
+from src.stats import get_returns, get_max_drawdown, get_pct_change
 
 import pandas as pd
 from typing import Dict
 from tqdm import tqdm
 
 class StructPortfolio:
-    def __init__(self, portfolio: pd.DataFrame, allocation: Dict):
+    def __init__(self, portfolio: pd.DataFrame, allocation: Dict, reinvested: float):
         self.portfolio = portfolio
         self.allocation = allocation
+        self.reinvested = reinvested
 
 
 def generate_report(portfolio: StructPortfolio, market: StructPortfolio,
@@ -36,9 +37,16 @@ def generate_report(portfolio: StructPortfolio, market: StructPortfolio,
     returns_plot = graphic_plot(returns_portfolio, returns_market, "Returns")
     drawdown_plot = graphic_plot(drawdown_portfolio, drawdown_market, "Drawdown")
 
+    portfolio_summary = StructSummaryData(returns_plot, drawdown_plot, portfolio.portfolio,
+                                          returns_portfolio, drawdown_portfolio,
+                                          portfolio.reinvested)
+    market_summary = StructSummaryData(None, None, market.portfolio,
+                                       returns_market, drawdown_market,
+                                       market.reinvested)
+
     document = PdfReport(pdf_name)
     document.first_page("Portfolio Report", returns_plot)
-    document.summary_page("Summary", returns_plot, drawdown_plot)
+    document.summary_page("Summary", portfolio_summary, market_summary)
 
     if not full_report:
         print("Concise report generated, creating PDF...")

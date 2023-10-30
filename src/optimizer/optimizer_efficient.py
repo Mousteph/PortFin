@@ -1,7 +1,10 @@
 from pypfopt import EfficientFrontier
 from pypfopt.risk_models import CovarianceShrinkage
 from pypfopt import expected_returns
+from pypfopt import risk_models
 from pypfopt import objective_functions
+from pypfopt import hierarchical_portfolio
+from pypfopt import cla
 
 import pandas as pd
 from typing import Dict
@@ -44,18 +47,29 @@ class OptimizerEfficient(OptimizerBase):
             ValueError: If the optimizer parameter is not "max_sharpe" or "min_volatility".
         """
 
-        mu = expected_returns.mean_historical_return(df)
-        S = CovarianceShrinkage(df).ledoit_wolf()
+        # mu = expected_returns.mean_historical_return(df)
+        mu = expected_returns.ema_historical_return(df)
+
+        # S = CovarianceShrinkage(df).ledoit_wolf()
+        S = risk_models.semicovariance(df)
+        # S = risk_models.exp_cov(df)
+        # S = risk_models.sample_cov(df)
         
-        ef = EfficientFrontier(mu, S)
-        ef.add_objective(objective_functions.L2_reg, gamma=self.gamma)
+        # ef = EfficientFrontier(mu, S)
+        # ef.add_objective(objective_functions.L2_reg, gamma=self.gamma)
+
+        ef = hierarchical_portfolio.HRPOpt(df, S)
+        ef.optimize()
+
+        # ef = cla.CLA(mu, S)
+        # ef.max_sharpe()
         
-        if self.optimizer == 'max_sharpe':
-            ef.max_sharpe()
-        elif self.optimizer == 'min_volatility':
-            ef.min_volatility()
-        else:
-            raise ValueError('Invalid optimizer. Must be either "max_sharpe" or "min_volatility".')
+        # if self.optimizer == 'max_sharpe':
+        #     ef.max_sharpe()
+        # elif self.optimizer == 'min_volatility':
+        #     ef.min_volatility()
+        # else:
+        #     raise ValueError('Invalid optimizer. Must be either "max_sharpe" or "min_volatility".')
         
         cleaned_weights = ef.clean_weights()
 

@@ -40,13 +40,13 @@ if __name__ == '__main__':
 
     optimizer_tickers = OptimizerEfficient(args.optimizer, args.gamma)
     allocations_tickers = generate_allocation(df_tickers, args.window, optimizer_tickers)
-    portfolio_tickers = generate_portfolio(df_tickers, allocations_tickers, args.money, args.reinvest)
-    portfolio = StructPortfolio(portfolio_tickers, allocations_tickers)
+    portfolio_tickers, ticker_rein = generate_portfolio(df_tickers, allocations_tickers, args.money, args.reinvest)
+    portfolio = StructPortfolio(portfolio_tickers, allocations_tickers, ticker_rein)
     
     optimizer_market = OptimizerBase()
     allocations_market = generate_allocation(market, args.window, optimizer_market)
-    portfolio_market = generate_portfolio(market, allocations_market, args.money, args.reinvest)
-    market = StructPortfolio(portfolio_market, allocations_market)
+    portfolio_market, market_rein = generate_portfolio(market, allocations_market, args.money, args.reinvest)
+    market = StructPortfolio(portfolio_market, allocations_market, market_rein)
     
     generate_report(portfolio, market, ticker_downloader, args.name, args.full)
     

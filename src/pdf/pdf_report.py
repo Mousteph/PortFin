@@ -1,10 +1,23 @@
 import matplotlib.pyplot as plt
 from io import BytesIO
 from typing import List
-from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4, inch
 from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, PageBreak, Table
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
+from reportlab.platypus import PageBreak, Table, TableStyle
+import pandas as pd
 
+class StructSummaryData:
+    def __init__(self, returns_figure: plt.figure, drawdown_figure: plt.Figure,
+                 price: pd.DataFrame, returns: pd.DataFrame, drawdown: pd.DataFrame,
+                 reinvested: float):
+        self.returns_figure = returns_figure
+        self.drawdown_figure = drawdown_figure
+        self.price = price
+        self.retruns = returns
+        self.drawdown = drawdown
+        self.reinvested = reinvested
 
 class PdfReport:
     """A class used to generate a PDF report.
@@ -86,7 +99,7 @@ class PdfReport:
 
         self.add_page_break()
 
-    def summary_page(self, title: str, returns: plt.Figure, drawdown: plt.Figure) -> None:
+    def summary_page(self, title: str, portfolio: StructSummaryData, market: StructSummaryData) -> None:
         """Adds a title and two images to a summary page of the report.
 
         Args:
@@ -95,15 +108,34 @@ class PdfReport:
             drawdown (plt.Figure): The matplotlib Figure object containing the drawdown data to add to the summary page of the report.
         """
         
-        returns = self.__create_image_pdf(returns, 270, 180)
-        drawdown = self.__create_image_pdf(drawdown, 270, 180)
+        returns = self.__create_image_pdf(portfolio.returns_figure, 270, 180)
+        drawdown = self.__create_image_pdf(portfolio.drawdown_figure, 270, 180)
         
         title = self.add_title(title)
         tables = Table([[returns, drawdown]])
-    
+        
+        data_summary = [['', 'Portfolio', 'Market'],
+                        ['Initial Investment', f"{round(portfolio.price.iloc[0][0], 2)}$", f"{round(market.price.iloc[0][0], 2)}$"],
+                        ['Money Reinvested', f"{portfolio.reinvested}$", f"{market.reinvested}$"],
+                        ['Final Value', f"{round(portfolio.price.iloc[-1][0], 2)}$", f"{round(market.price.iloc[-1][0], 2)}$"],
+                        ['Returns', f"{round(portfolio.retruns.iloc[-1][0] * 100, 2)}%", f"{round(market.retruns.iloc[-1][0] * 100, 2)}%"],
+                        ['Max Drawdown', f"{round(portfolio.drawdown.min()[0] * 100, 2)}%", f"{round(market.drawdown.min()[0] * 100, 2)}%"]]
+
+        table_summary = Table(data_summary, len(data_summary[0]) * [2 * inch], len(data_summary) * [0.3 * inch])
+        table_summary.setStyle(TableStyle([
+            ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+            ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+            ('ALIGN', (0,0), (0, 2), 'LEFT'),
+            ('ALIGN', (0,0),(0, -1), 'LEFT'),
+            ('BACKGROUND', (0, 0), (0, -1), colors.beige),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.beige),
+                       ]))
+        
         self.report.append(title)
         self.report.append(Spacer(1, 12))
-        self.report.append(tables)        
+        self.report.append(tables)
+        self.report.append(Spacer(1, 30))
+        self.report.append(table_summary)
         
         self.add_page_break()
 
