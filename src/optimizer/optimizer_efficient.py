@@ -23,7 +23,7 @@ class OptimizerEfficient(OptimizerBase):
         __call__: Optimizes a portfolio using the Efficient Frontier algorithm.
     """
 
-    def __init__(self, optimizer: str = "max_sharpe", gamma: float = 0.1):
+    def __init__(self, optimizer: str = "max_sharpe", gamma: float = 0.1, min_weight: float = 0.05):
         """Initializes a new instance of the OptimizerEfficient class.
 
         Args:
@@ -33,6 +33,7 @@ class OptimizerEfficient(OptimizerBase):
 
         self.optimizer = optimizer
         self.gamma = gamma
+        self.min_weight = min_weight
         
     def __call__(self, df: pd.DataFrame) -> Dict[str, float]:
         """Optimizes a portfolio using the Efficient Frontier algorithm.
@@ -73,4 +74,4 @@ class OptimizerEfficient(OptimizerBase):
         
         cleaned_weights = ef.clean_weights()
 
-        return {i: cleaned_weights[i] for i in cleaned_weights if cleaned_weights[i] > 0}
+        return {i: cleaned_weights[i] for i in cleaned_weights if cleaned_weights[i] > self.min_weight}
