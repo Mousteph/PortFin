@@ -60,26 +60,29 @@ def generate_report(portfolio: StructPortfolio, market: StructPortfolio,
     for year in t_range:
         t_range.set_description(f"Generating  report page for {year}")
         t_range.refresh()
-        
+       
+        # Portfolio 
         portfolio_year = portfolio.portfolio.loc[str(year)]
-        market_year = market.portfolio.loc[str(year)]
-        
         returns_portfolio_year = get_returns(portfolio_year)
-        returns_market_year = get_returns(market_year)
         drawdown_portfolio_year = get_max_drawdown(portfolio_year)
-        drawdown_market_year = get_max_drawdown(market_year)
-        
+
         title_allocation = f"Portfolio allocation % in {year}"
         allocation_plot_year = allocation_plot(title_allocation, portfolio.allocation.get(year))
+        
+        # Market
+        market_year = market.portfolio.loc[str(year)]
+        drawdown_market_year = get_max_drawdown(market_year)
+        returns_market_year = get_returns(market_year)
 
         title_allocatio_sector = f"Portfolio allocation % in {year} by sector"
         allocation_sector = downloader.generate_allocation_sectors(portfolio.allocation.get(year))
         all_sector_plot_year = allocation_plot(title_allocatio_sector, allocation_sector)
-        
-        returns_plot_year = graphic_plot(returns_portfolio_year, returns_market_year, "Returns")
-        drawdown_plot_year = graphic_plot(drawdown_portfolio_year, drawdown_market_year, "Drawdown")
+       
+        # Figures
+        returns_figure = graphic_plot(returns_portfolio_year, returns_market_year, "Returns")
+        drawdown_figure = graphic_plot(drawdown_portfolio_year, drawdown_market_year, "Drawdown")
 
-        data = StructYearSummaryData(returns_plot_year, drawdown_plot_year,
+        data = StructYearSummaryData(returns_figure, drawdown_figure,
                                      allocation_plot_year, all_sector_plot_year,
                                      portfolio_year, returns_portfolio_year, drawdown_portfolio_year,
                                      portfolio.allocation.get(year))
@@ -89,7 +92,6 @@ def generate_report(portfolio: StructPortfolio, market: StructPortfolio,
                                             market.allocation.get(year))
         
         document.year_page(f"Year {year}", data, data_market)
-        # document.year_page(f"Year {year}", returns_plot_year, drawdown_plot_year, allocation_plot_year, all_sector_plot_year)
         
     print("Full report generated, creating PDF...")
     document.create_document()
