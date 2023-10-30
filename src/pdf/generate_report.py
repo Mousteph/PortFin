@@ -1,7 +1,7 @@
-from src.pdf.pdf_report import PdfReport, StructSummaryData
+from src.pdf.pdf_report import PdfReport, StructSummaryData, StructYearSummaryData
 from src.tickers import TickerDownloader
 from src.graphics import graphic_plot, allocation_plot
-from src.stats import get_returns, get_max_drawdown, get_pct_change
+from src.stats import get_returns, get_max_drawdown
 
 import pandas as pd
 from typing import Dict
@@ -78,8 +78,18 @@ def generate_report(portfolio: StructPortfolio, market: StructPortfolio,
         
         returns_plot_year = graphic_plot(returns_portfolio_year, returns_market_year, "Returns")
         drawdown_plot_year = graphic_plot(drawdown_portfolio_year, drawdown_market_year, "Drawdown")
+
+        data = StructYearSummaryData(returns_plot_year, drawdown_plot_year,
+                                     allocation_plot_year, all_sector_plot_year,
+                                     portfolio_year, returns_portfolio_year, drawdown_portfolio_year,
+                                     portfolio.allocation.get(year))
         
-        document.year_page(f"Year {year}", returns_plot_year, drawdown_plot_year, allocation_plot_year, all_sector_plot_year)
+        data_market = StructYearSummaryData(None, None, None, None, market_year,
+                                            returns_market_year, drawdown_market_year,
+                                            market.allocation.get(year))
+        
+        document.year_page(f"Year {year}", data, data_market)
+        # document.year_page(f"Year {year}", returns_plot_year, drawdown_plot_year, allocation_plot_year, all_sector_plot_year)
         
     print("Full report generated, creating PDF...")
     document.create_document()

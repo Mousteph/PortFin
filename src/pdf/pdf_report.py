@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from io import BytesIO
-from typing import List
+from typing import List, Dict
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, inch
 from reportlab.lib.styles import getSampleStyleSheet
@@ -15,9 +15,23 @@ class StructSummaryData:
         self.returns_figure = returns_figure
         self.drawdown_figure = drawdown_figure
         self.price = price
-        self.retruns = returns
+        self.returns = returns
         self.drawdown = drawdown
         self.reinvested = reinvested
+
+class StructYearSummaryData:
+    def __init__(self, returns_figure: plt.figure, drawdown_figure: plt.Figure,
+                 allocation_figure: plt.Figure, allocation_sector_figure: plt.Figure,
+                 price: pd.DataFrame, returns: pd.DataFrame, drawdown: pd.DataFrame,
+                 allocation: Dict):
+        self.returns_figure = returns_figure
+        self.drawdown_figure = drawdown_figure
+        self.allocation_figure = allocation_figure
+        self.allocation_sector_figure = allocation_sector_figure
+        self.price = price
+        self.returns = returns
+        self.drawdown = drawdown
+        self.allocation = allocation
 
 class PdfReport:
     """A class used to generate a PDF report.
@@ -118,7 +132,7 @@ class PdfReport:
                         ['Initial Investment', f"{round(portfolio.price.iloc[0][0], 2)}$", f"{round(market.price.iloc[0][0], 2)}$"],
                         ['Money Reinvested', f"{portfolio.reinvested}$", f"{market.reinvested}$"],
                         ['Final Value', f"{round(portfolio.price.iloc[-1][0], 2)}$", f"{round(market.price.iloc[-1][0], 2)}$"],
-                        ['Returns', f"{round(portfolio.retruns.iloc[-1][0] * 100, 2)}%", f"{round(market.retruns.iloc[-1][0] * 100, 2)}%"],
+                        ['Returns', f"{round((portfolio.returns.iloc[-1][0] - 1) * 100, 2)}%", f"{round((market.returns.iloc[-1][0] - 1) * 100, 2)}%"],
                         ['Max Drawdown', f"{round(portfolio.drawdown.min()[0] * 100, 2)}%", f"{round(market.drawdown.min()[0] * 100, 2)}%"]]
 
         table_summary = Table(data_summary, len(data_summary[0]) * [2 * inch], len(data_summary) * [0.3 * inch])
@@ -139,7 +153,8 @@ class PdfReport:
         
         self.add_page_break()
 
-    def year_page(self, title: str, returns: plt.Figure, drawdown: plt.Figure, allocation: plt.Figure, allocation_sector: plt.Figure) -> None:
+    # def year_page(self, title: str, returns: plt.Figure, drawdown: plt.Figure, allocation: plt.Figure, allocation_sector: plt.Figure) -> None:
+    def year_page(self, title: str, data: StructYearSummaryData, data_market: StructYearSummaryData) -> None:
         """Adds a title and four images to a yearly page of the report.
 
         Args:
@@ -150,19 +165,39 @@ class PdfReport:
             allocation_sector (plt.Figure): The matplotlib Figure object containing the allocation sector data to add to the yearly page of the report.
         """
         
-        returns = self.__create_image_pdf(returns, 270, 180)
-        drawdown = self.__create_image_pdf(drawdown, 270, 180)
-        allocation = self.__create_image_pdf(allocation, 270, 270)
-        allocation_sector = self.__create_image_pdf(allocation_sector, 270, 270)
+        returns = self.__create_image_pdf(data.returns_figure, 270, 180)
+        drawdown = self.__create_image_pdf(data.drawdown_figure, 270, 180)
+        allocation = self.__create_image_pdf(data.allocation_figure, 270, 270)
+        allocation_sector = self.__create_image_pdf(data.allocation_sector_figure, 270, 270)
         
         title = self.add_title(title)
         alloc = Table([[allocation, allocation_sector]])
         retur = Table([[returns, drawdown]])
+        
+        data_summary = [['', 'Portfolio', 'Market'],
+                        ['Number of assets', len(data.allocation), len(data_market.allocation)],
+                        ['Initial Value', f"{round(data.price.iloc[0][0], 2)}$", f"{round(data_market.price.iloc[0][0], 2)}$"],
+                        ['Final Value', f"{round(data.price.iloc[-1][0], 2)}$", f"{round(data_market.price.iloc[-1][0], 2)}$"],
+                        ['Returns', f"{round((data.returns.iloc[-1][0] - 1) * 100, 2)}%", f"{round((data_market.returns.iloc[-1][0] - 1) * 100, 2)}%"],
+                        ['Max Drawdown', f"{round(data.drawdown.min()[0] * 100, 2)}%", f"{round(data_market.drawdown.min()[0] * 100, 2)}%"]]
+
+        table_summary = Table(data_summary, len(data_summary[0]) * [2 * inch], len(data_summary) * [0.3 * inch])
+        table_summary.setStyle(TableStyle([
+            ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+            ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+            ('ALIGN', (0,0), (0, 2), 'LEFT'),
+            ('ALIGN', (0,0),(0, -1), 'LEFT'),
+            ('BACKGROUND', (0, 0), (0, -1), colors.beige),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.beige),
+                       ]))
+        
         
         self.report.append(title)
         self.report.append(Spacer(1, 12))
         self.report.append(alloc)
         self.report.append(Spacer(1, 12))
         self.report.append(retur)
+        self.report.append(Spacer(1, 30))
+        self.report.append(table_summary)
 
         self.add_page_break()
