@@ -2,6 +2,7 @@ from src.pdf.pdf_report import PdfReport, StructSummaryData, StructYearSummaryDa
 from src.tickers import TickerDownloader
 from src.graphics import graphic_plot, allocation_plot
 from src.stats import get_returns, get_max_drawdown
+import argparse
 
 import pandas as pd
 from typing import Dict
@@ -23,19 +24,20 @@ class StructPortfolio:
 
 
 def generate_report(portfolio: StructPortfolio, market: StructPortfolio,
-                    downloader: TickerDownloader, pdf_name: str = 'report.pdf',
-                    full_report: bool = True) -> None:
+                    downloader: TickerDownloader, args: argparse.Namespace) -> None:
     """Generates a PDF report containing portfolio performance metrics and visualizations.
+
+    This function generates a PDF report that includes a summary page and yearly pages. The summary page includes 
+    returns and drawdown plots for the entire period of the portfolio and market. Each yearly page includes returns 
+    and drawdown plots, an allocation plot, and an allocation by sector plot for the portfolio and market for that year.
 
     Args:
         portfolio (StructPortfolio): A StructPortfolio object containing the portfolio data.
         market (StructPortfolio): A StructPortfolio object containing the market data.
-        allocations (Dict): A dictionary containing the asset allocation weights for each year.
         downloader (TickerDownloader): A TickerDownloader object used to download and process financial data.
-        pdf_name (str, optional): The name of the PDF report. Defaults to 'report.pdf'.
-        full_report (bool, optional): Whether to generate a full report or not. Defaults to True.
+        args (argparse.Namespace): The arguments passed to the script, which include details about the backtest.
     """
-
+    
     print("Generating report...")
     returns_portfolio = get_returns(portfolio.portfolio)
     returns_market = get_returns(market.portfolio)
@@ -52,11 +54,11 @@ def generate_report(portfolio: StructPortfolio, market: StructPortfolio,
                                        returns_market, drawdown_market,
                                        market.reinvested)
 
-    document = PdfReport(pdf_name)
-    document.first_page("Portfolio Report", returns_plot)
+    document = PdfReport(args.name)
+    document.first_page("Portfolio Report", returns_plot, args)
     document.summary_page("Summary", portfolio_summary, market_summary)
 
-    if not full_report:
+    if not args.full:
         print("Concise report generated, creating PDF...")
         document.create_document()
         return

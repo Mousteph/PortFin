@@ -7,6 +7,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
 from reportlab.platypus import PageBreak, Table, TableStyle
 import pandas as pd
+import argparse
 
 class StructSummaryData:
     def __init__(self, returns_figure: plt.figure, drawdown_figure: plt.Figure,
@@ -114,20 +115,53 @@ class PdfReport:
         title = Paragraph(title, title_style)
         self.report.append(title)
 
-    def first_page(self, title: str, image: plt.Figure) -> None:
-        """Adds a title and image to the first page of the report.
+    def first_page(self, title: str, image: plt.Figure, args: argparse.Namespace) -> None:
+        """Adds a title, image, and backtest details to the first page of the report.
+
+        This method creates the first page in the report, which includes a title, an image, and details about the backtest. 
+        The image is created from the matplotlib Figure object. The backtest details include the backtest period, rolling window, 
+        initial investment, reinvestment amount, selected optimizer, minimum asset weight, and other details specific to the 
+        efficient optimizer. The backtest details are formatted and added as a Paragraph object to the report.
 
         Args:
             title (str): The title to be added to the first page of the report.
             image (plt.Figure): The matplotlib Figure object to add to the first page of the report.
+            args (argparse.Namespace): The arguments passed to the script, which include details about the backtest.
         """
         
         image = self.__create_image_pdf(image, 450, 300)
-        title = self.add_title(title)  
+        title = self.add_title(title)
+        
+        current_date = pd.to_datetime("today")
+        start_date = current_date.year - args.years + args.window
+        start_date = f"{start_date}-01-01"
+        end_date = str(current_date.date())
+        
+        details_info = ""
+        if args.optimizer == 'efficient':
+            details_info = f"Regularization parameter: {args.gamma} | Type of the objective: {args.type}"
+            
+        backtest = f"""Backtest from {start_date} to {end_date}<br />\n
+        <br />\n
+        Rolling window: {args.window} years<br />\n
+        Initial investment: {args.money}$ | Reinvest each year: {args.reinvest}$<br />\n
+        Optimizer selected: {args.optimizer} | Minimum asset weight: {args.weight * 100}%<br />\n
+        {details_info}<br />\n
+        <br />\n
+        Backtest performed on {current_date.date()} at by PortFin.
+        """
+        
+        backtest_style = self.styles["BodyText"]
+        backtest_style.alignment = 1
+        backtest_style.fontSize = 14
+        backtest_style.leading = 20
+        backtest = Paragraph(backtest, backtest_style)
         
         self.report.append(title)
         self.report.append(Spacer(1, 12))
         self.report.append(image)
+        self.report.append(Spacer(1, 30))
+        self.report.append(backtest)
 
         self.add_page_break()
 

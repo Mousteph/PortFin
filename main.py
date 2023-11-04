@@ -58,5 +58,5 @@ if __name__ == '__main__':
     portfolio_market, market_rein = generate_portfolio(sp500_market, allocations_market, args.money, args.reinvest)
     market = StructPortfolio(portfolio_market, allocations_market, market_rein)
 
-    generate_report(portfolio, market, ticker_downloader, args.name, args.full)
+    generate_report(portfolio, market, ticker_downloader, args)
     
