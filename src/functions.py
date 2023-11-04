@@ -20,12 +20,28 @@ def __delete_null_tickers(tickers: pd.DataFrame) -> pd.DataFrame:
     return tickers
 
 def one_year_allocation(df_tickers: pd.DataFrame, x_years_lb: int, year: int, optimizer: OptimizerBase) -> Dict[int, float]:
-        df_x_year = df_tickers.loc[str(year - x_years_lb):str(year - 1)]
-        df_x_year = __delete_null_tickers(df_x_year)
-        
-        allocation = optimizer(df_x_year)
+    """Calculates the allocation for one year based on the given data and optimizer.
 
-        return {year: allocation}
+    This function takes a DataFrame of tickers, a lookback period, a year, and an optimizer. It filters the DataFrame 
+    for the lookback period ending in the given year, removes any tickers with null values, and then calculates the 
+    allocation using the given optimizer.
+
+    Args:
+        df_tickers (pd.DataFrame): The DataFrame of tickers.
+        x_years_lb (int): The lookback period in years.
+        year (int): The year for which to calculate the allocation.
+        optimizer (OptimizerBase): The optimizer to use for calculating the allocation.
+
+    Returns:
+        Dict[int, float]: A dictionary with the year as the key and the allocation as the value.
+    """
+
+    df_x_year = df_tickers.loc[str(year - x_years_lb):str(year - 1)]
+    df_x_year = __delete_null_tickers(df_x_year)
+    
+    allocation = optimizer(df_x_year)
+
+    return {year: allocation}
     
 
 def generate_allocation(df_tickers: pd.DataFrame, x_years_lb: int, optimizer: OptimizerBase) -> Dict[int, Dict[str, float]]:

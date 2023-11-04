@@ -17,6 +17,7 @@ def graphic_plot(portfolio: pd.DataFrame, market: pd.DataFrame, title: str) -> p
     Returns:
         plt.Figure: A matplotlib Figure object containing the plot.
     """
+
     first_date = portfolio.index[0].date()
     last_date = portfolio.index[-1].date()
     
