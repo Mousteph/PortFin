@@ -37,6 +37,7 @@ class OptimizerHierarchical(OptimizerBase):
 
         S = risk_models.semicovariance(df)
         ef = hierarchical_portfolio.HRPOpt(df, S)
+
         ef.optimize()
         
         cleaned_weights = ef.clean_weights()

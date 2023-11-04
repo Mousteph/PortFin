@@ -19,6 +19,15 @@ def __delete_null_tickers(tickers: pd.DataFrame) -> pd.DataFrame:
     
     return tickers
 
+def one_year_allocation(df_tickers: pd.DataFrame, x_years_lb: int, year: int, optimizer: OptimizerBase) -> Dict[int, float]:
+        df_x_year = df_tickers.loc[str(year - x_years_lb):str(year - 1)]
+        df_x_year = __delete_null_tickers(df_x_year)
+        
+        allocation = optimizer(df_x_year)
+
+        return {year: allocation}
+    
+
 def generate_allocation(df_tickers: pd.DataFrame, x_years_lb: int, optimizer: OptimizerBase) -> Dict[int, Dict[str, float]]:
     """Generates an allocation for each year between the first year and x_years_lb years after the first year.
 
@@ -43,12 +52,8 @@ def generate_allocation(df_tickers: pd.DataFrame, x_years_lb: int, optimizer: Op
     for year in t_range:
         t_range.set_description(f"Generating allocations for {year}")
         t_range.refresh()
-        
-        df_x_year = df_tickers.loc[str(year - x_years_lb):str(year - 1)]
-        df_x_year = __delete_null_tickers(df_x_year)
-        
-        allocation = optimizer(df_x_year)
-        allocation_years[year] = allocation
+
+        allocation_years.update(one_year_allocation(df_tickers, x_years_lb, year, optimizer))
         
     return allocation_years
     

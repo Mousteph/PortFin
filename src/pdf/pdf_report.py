@@ -153,7 +153,6 @@ class PdfReport:
         
         self.add_page_break()
 
-    # def year_page(self, title: str, returns: plt.Figure, drawdown: plt.Figure, allocation: plt.Figure, allocation_sector: plt.Figure) -> None:
     def year_page(self, title: str, data: StructYearSummaryData, data_market: StructYearSummaryData) -> None:
         """Adds a title and four images to a yearly page of the report.
 

@@ -20,8 +20,8 @@ def generate_report(portfolio: StructPortfolio, market: StructPortfolio,
     """Generates a PDF report containing portfolio performance metrics and visualizations.
 
     Args:
-        portfolio (pd.DataFrame): A pandas DataFrame containing the portfolio returns.
-        market (pd.DataFrame): A pandas DataFrame containing the market returns.
+        portfolio (StructPortfolio): A StructPortfolio object containing the portfolio data.
+        market (StructPortfolio): A StructPortfolio object containing the market data.
         allocations (Dict): A dictionary containing the asset allocation weights for each year.
         downloader (TickerDownloader): A TickerDownloader object used to download and process financial data.
         pdf_name (str, optional): The name of the PDF report. Defaults to 'report.pdf'.
