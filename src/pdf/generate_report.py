@@ -9,6 +9,14 @@ from tqdm import tqdm
 
 class StructPortfolio:
     def __init__(self, portfolio: pd.DataFrame, allocation: Dict, reinvested: float):
+        """StructPortfolio constructor.
+
+        Args:
+            portfolio (pd.DataFrame): Pandas DataFrame containing the portfolio data.
+            allocation (Dict): A dictionary containing the asset allocation weights for each year.
+            reinvested (float): The amount of money reinvested in the portfolio.
+        """
+        
         self.portfolio = portfolio
         self.allocation = allocation
         self.reinvested = reinvested

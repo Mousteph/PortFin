@@ -12,6 +12,17 @@ class StructSummaryData:
     def __init__(self, returns_figure: plt.figure, drawdown_figure: plt.Figure,
                  price: pd.DataFrame, returns: pd.DataFrame, drawdown: pd.DataFrame,
                  reinvested: float):
+        """Constructs all the necessary attributes for the StructSummaryData object.
+
+        Args:
+            returns_figure (plt.figure): The figure object for returns.
+            drawdown_figure (plt.Figure): The figure object for drawdown.
+            price (pd.DataFrame): The DataFrame object for price.
+            returns (pd.DataFrame): The DataFrame object for returns.
+            drawdown (pd.DataFrame): The DataFrame object for drawdown.
+            reinvested (float): The reinvested amount.
+        """
+        
         self.returns_figure = returns_figure
         self.drawdown_figure = drawdown_figure
         self.price = price
@@ -24,6 +35,19 @@ class StructYearSummaryData:
                  allocation_figure: plt.Figure, allocation_sector_figure: plt.Figure,
                  price: pd.DataFrame, returns: pd.DataFrame, drawdown: pd.DataFrame,
                  allocation: Dict):
+        """Constructs all the necessary attributes for the StructYearSummaryData object.
+
+        Args:
+            returns_figure (plt.figure): The figure object for returns.
+            drawdown_figure (plt.Figure): The figure object for drawdown.
+            allocation_figure (plt.Figure): The figure object for allocation.
+            allocation_sector_figure (plt.Figure): The figure object for allocation by sector.
+            price (pd.DataFrame): The DataFrame object for price.
+            returns (pd.DataFrame): The DataFrame object for returns.
+            drawdown (pd.DataFrame): The DataFrame object for drawdown.
+            allocation (Dict): The dictionary object for allocation.
+        """
+        
         self.returns_figure = returns_figure
         self.drawdown_figure = drawdown_figure
         self.allocation_figure = allocation_figure
@@ -35,12 +59,6 @@ class StructYearSummaryData:
 
 class PdfReport:
     """A class used to generate a PDF report.
-
-    Attributes:
-        pdf_name (str): The name of the PDF file to be generated.
-        doc (SimpleDocTemplate): The SimpleDocTemplate object used to build the PDF document.
-        styles (reportlab.lib.styles.StyleSheet): The StyleSheet object used to define the styles of the report.
-        report (List): The list of Platypus flowables used to build the PDF document.
     """
     
     def __create_image_pdf(self, image: plt.Figure, width: int = 600, height: int = 400, align: str = "CENTER") -> Image:
@@ -114,12 +132,17 @@ class PdfReport:
         self.add_page_break()
 
     def summary_page(self, title: str, portfolio: StructSummaryData, market: StructSummaryData) -> None:
-        """Adds a title and two images to a summary page of the report.
+        """Adds a title, two images, and a summary table to a summary page of the report.
+
+        This method creates a summary page in the report, which includes a title, two images (returns and drawdown), 
+        and a summary table. The images are created from the matplotlib Figure objects in the StructSummaryData objects 
+        for the portfolio and market. The summary table includes data such as initial investment, money reinvested, 
+        final value, returns, and max drawdown for both the portfolio and market.
 
         Args:
             title (str): The title to be added to the summary page of the report.
-            returns (plt.Figure): The matplotlib Figure object containing the returns data to add to the summary page of the report.
-            drawdown (plt.Figure): The matplotlib Figure object containing the drawdown data to add to the summary page of the report.
+            portfolio (StructSummaryData): The StructSummaryData object containing the portfolio data.
+            market (StructSummaryData): The StructSummaryData object containing the market data.
         """
         
         returns = self.__create_image_pdf(portfolio.returns_figure, 270, 180)
@@ -154,14 +177,17 @@ class PdfReport:
         self.add_page_break()
 
     def year_page(self, title: str, data: StructYearSummaryData, data_market: StructYearSummaryData) -> None:
-        """Adds a title and four images to a yearly page of the report.
+        """Adds a title, four images, and a summary table to a yearly page of the report.
+
+        This method creates a yearly page in the report, which includes a title, four images (returns, drawdown, allocation, 
+        and allocation by sector), and a summary table. The images are created from the matplotlib Figure objects in the 
+        StructYearSummaryData objects for the data and data_market. The summary table includes data such as number of assets, 
+        initial value, final value, returns, and max drawdown for both the data and data_market.
 
         Args:
             title (str): The title to be added to the yearly page of the report.
-            returns (plt.Figure): The matplotlib Figure object containing the returns data to add to the yearly page of the report.
-            drawdown (plt.Figure): The matplotlib Figure object containing the drawdown data to add to the yearly page of the report.
-            allocation (plt.Figure): The matplotlib Figure object containing the allocation data to add to the yearly page of the report.
-            allocation_sector (plt.Figure): The matplotlib Figure object containing the allocation sector data to add to the yearly page of the report.
+            data (StructYearSummaryData): The StructYearSummaryData object containing the data.
+            data_market (StructYearSummaryData): The StructYearSummaryData object containing the market data.
         """
         
         returns = self.__create_image_pdf(data.returns_figure, 270, 180)
