@@ -50,7 +50,8 @@ def allocation_plot(title: str, allocation: Dict) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(7, 7), dpi=300)
     
     sizes = list(allocation.values())
-    labels = list(allocation.keys())
+    sizes.append(1 - sum(sizes))
+    labels = list(allocation.keys()) + ['Cash']
     
     ax.pie(sizes, labels=labels, autopct='%.2f%%')
     ax.set_title(title, fontdict={'fontsize':8})
