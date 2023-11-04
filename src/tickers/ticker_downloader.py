@@ -94,6 +94,15 @@ class TickerDownloader:
         return self.__sp500
 
     def get_all_sp500_tickers_filtered(self) -> pd.DataFrame:
+        """Fetches and filters the S&P 500 tickers.
+
+        This method retrieves the raw S&P 500 tickers, drops unnecessary columns, renames the remaining columns, 
+        converts the 'Added' column to datetime format, and sets 'Ticker' as the index of the DataFrame.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing the filtered S&P 500 tickers.
+        """
+
         cols_name = {
             "Symbol": "Ticker", 
             "Security": "Name", 
