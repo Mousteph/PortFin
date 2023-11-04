@@ -11,13 +11,6 @@ from .optimizer_base import OptimizerBase
 
 class OptimizerEfficient(OptimizerBase):
     """Class for optimizing a portfolio using the Efficient Frontier algorithm.
-
-    Attributes:
-        optimizer (str): The optimization objective to use. Must be either "max_sharpe" or "min_volatility".
-        gamma (float): The regularization parameter for the L2 regularization objective.
-
-    Methods:
-        __call__: Optimizes a portfolio using the Efficient Frontier algorithm.
     """
 
     def __init__(self, optimizer: str = "max_sharpe", gamma: float = 0.1, min_weight: float = 0.05):

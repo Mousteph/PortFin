@@ -11,9 +11,6 @@ class OptimizerHierarchical(OptimizerBase):
     """A Hierarchical Risk Parity optimizer.
 
     This class extends the OptimizerBase class and implements a Hierarchical Risk Parity optimizer.
-
-    Attributes:
-        min_weight (float): The minimum weight for an asset in the portfolio. Default is 0.05.
     """
 
     def __init__(self, min_weight: float = 0.05):

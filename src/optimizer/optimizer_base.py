@@ -3,9 +3,8 @@ from typing import Dict
 
 class OptimizerBase:
     """Base class for portfolio optimization.
-
-    Methods:
-        __call__: Calculates the portfolio weights for a given DataFrame.
+    
+    Equally weights all assets in the portfolio.
     """
 
     def __call__(self, df: pd.DataFrame) -> Dict[str, float]:
