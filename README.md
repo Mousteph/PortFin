@@ -6,6 +6,10 @@
 
 PortFin is a project designed to compare the performance of dynamically allocated investment portfolios with the market, S&P500. It leverages historical data of the assets of the S&P500 to generate new portfolios each year and allocates assets accordingly. All the information are then compiled into a PDF report.
 
+### Results
+
+Some benchmark results are saved in the `exemples` folder.
+
 ## Usage
 
 To run PortFin, use the following command:
